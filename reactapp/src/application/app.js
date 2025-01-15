@@ -14,7 +14,7 @@ import StudentComponent from "./ApplicationComponents/User/StudentComponent";
 import ProductComponent from "./ApplicationComponents/User/ProductComponent";
 import CartComponent from "./ApplicationComponents/User/CartComponent";
 import CheckoutComponent from "./ApplicationComponents/User/CheckoutComponent";
-import CouponComponent from "./ApplicationComponents/User/CouponComponent";
+//import CouponComponent from "./ApplicationComponents/User/CouponComponent";
 //import UserHooksComponent from "./ApplicationComponents/User/UserHooksComponent";
 import UserHooksComponentRef from "./ApplicationComponents/User/UserHooksComponentRef";
 
@@ -64,7 +64,7 @@ export default class ApplicationComponent extends React.Component {
                         <Route path="product" element={<ProductComponent />}/>
                         <Route path="cart" element={<CartComponent />}/>
                         <Route path="checkout" element={<CheckoutComponent />} />
-                        <Route path="coupon" element={<CouponComponent />} />
+                        {/* <Route path="coupon" element={<CouponComponent />} /> */}
                         <Route path="app" element={<AppCopy />} />
                         <Route path="about" element={<About />} />
                         <Route path="about/:id" element={<About />} />
