@@ -1,6 +1,5 @@
 import * as actionTypes from "../ActionTypes";
 
-// Initial state for the cart
 const initialState = {
     cartItems: [], 
     error: null,   

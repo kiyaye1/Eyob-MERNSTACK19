@@ -4,7 +4,8 @@ import "./app.css";
 import Footer from "./CommonComponents/FooterComponent";
 import Header from "./CommonComponents/HeaderComponent";
 import { AppCopy } from "./CommonComponents/AppCopy";
-import Home from "./CommonComponents/HomeComponent";
+//import Home from "./CommonComponents/HomeComponent";
+import Home from './CommonComponents/HomeTrainerComponent'
 import About from "./CommonComponents/AboutComponent";
 import NotFound from "./CommonComponents/NotFoundComponent";
 //import UserComponent from "./ApplicationComponents/User/UserComponent.jsx"; //instead of component we are loading container
@@ -14,22 +15,16 @@ import StudentComponent from "./ApplicationComponents/User/StudentComponent";
 import ProductComponent from "./ApplicationComponents/User/ProductComponent";
 import CartComponent from "./ApplicationComponents/User/CartComponent";
 import CheckoutComponent from "./ApplicationComponents/User/CheckoutComponent";
+import RecentOrders from "./ApplicationComponents/User/RecentOrders";
 //import CouponComponent from "./ApplicationComponents/User/CouponComponent";
 //import UserHooksComponent from "./ApplicationComponents/User/UserHooksComponent";
 import UserHooksComponentRef from "./ApplicationComponents/User/UserHooksComponentRef";
+import CurrentTime from "./CommonComponents/JanAssessment/CurrTimeComponent";
+import ATMDispencer from "./CommonComponents/JanAssessment/ATMDispencer";
 
 export default class ApplicationComponent extends React.Component {
     constructor(props) {
         super(props); //is used to passback data <props -here> so that its udpated in base object for react framework
-
-        //state - object is used to allow udpdation of values via react rendering life cycle
-        /*this.state = {
-            userName : "Duncan",
-            user : {
-                address : "Somewhere on earth",
-                session : "Somehwere on webex"
-            }
-        }*/
 
         this.state = {
             user: {
@@ -64,13 +59,16 @@ export default class ApplicationComponent extends React.Component {
                         <Route path="product" element={<ProductComponent />}/>
                         <Route path="cart" element={<CartComponent />}/>
                         <Route path="checkout" element={<CheckoutComponent />} />
-                        {/* <Route path="coupon" element={<CouponComponent />} /> */}
+                        <Route path="recent-orders" element={<RecentOrders />} /> 
                         <Route path="app" element={<AppCopy />} />
                         <Route path="about" element={<About />} />
+                        <Route path="time" element={<CurrentTime />} />
+                        <Route path="atm-dispencer" element={<ATMDispencer />} />
                         <Route path="about/:id" element={<About />} />
                         <Route path="*" element={<NotFound />}/>
                     </Routes>
                 <Footer/>
-            </Router>)
+            </Router>
+        )
     }
 }

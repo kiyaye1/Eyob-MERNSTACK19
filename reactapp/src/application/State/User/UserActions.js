@@ -23,7 +23,7 @@ export const fetchUserFailure = (error) => ({
 });
 
 // Save user data using Fetch API
-export const SaveUserToDBUsingFetch = (userObj) => {
+/*export const SaveUserToDBUsingFetch = (userObj) => {
     console.log("SaveUserToDBUsingFetch called");
     return (dispatch) => {
         window
@@ -43,7 +43,7 @@ export const SaveUserToDBUsingFetch = (userObj) => {
             })
             .catch((error) => console.log(error));
     };
-};
+};*/
 
 // Save user data using Axios
 export const SaveUserToDBUsingAxios = (userObj) => {
@@ -79,3 +79,63 @@ export const fetchUserData = (userName) => {
         }
     };
 };
+
+export const SignOutUser = () => {
+    return (dispatch) => {
+      dispatch({
+        type: actionTypes.SIGN_OUT_USER,
+      })
+  
+      /*//clear the cart when user signout
+      dispatch(EMPTY_CART())
+      //clear the coupon when user signout
+      dispatch(EMPTY_COUPON())
+      //clear the order when user signout
+      dispatch(EMPTY_ORDER())*/
+    }
+}
+
+
+export const fetchUserHobbiesSuccess = (hobbies) => ({
+    type: actionTypes.FETCH_USER_HOBBIES_SUCCESS,
+    payload: hobbies,
+});
+
+export const fetchUserHobbiesFailure = (error) => ({
+    type: actionTypes.FETCH_USER_HOBBIES_FAILURE,
+    payload: error,
+});
+
+export const addHobbySuccess = (hobby) => ({
+    type: actionTypes.ADD_HOBBY_SUCCESS,
+    payload: hobby,
+});
+
+
+export const addHobbyFailure = (error) => ({
+    type: actionTypes.ADD_HOBBY_FAILURE,
+    payload: error,
+});
+
+
+export const fetchUserHobbiesFromDB = (userName) => async (dispatch) => {
+    try {
+        const response = await axios.get(`http://localhost:9000/user/hobbies?userName=${userName}`);
+        dispatch(fetchUserHobbiesSuccess(response.data));
+    } catch (error) {
+        dispatch(fetchUserHobbiesFailure(error.message));
+    }
+};
+
+
+export const addHobbyToDB = (userName, hobby) => async (dispatch) => {
+    try {
+        const response = await axios.post("http://localhost:9000/user/addHobby", { userName, hobby });
+        dispatch(addHobbySuccess(response.data));
+    } catch (error) {
+        dispatch(addHobbyFailure(error.message));
+    }
+}
+
+
+

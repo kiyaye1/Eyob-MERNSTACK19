@@ -5,7 +5,8 @@ let initialState = {
         userName: "",
         password: "",
         street: "",
-        mobile: 0
+        mobile: 0,
+        hobbies: [],
     },
 
     token: null,
@@ -34,6 +35,35 @@ let userReducer = (state = initialState, action) => {
                     ...state,
                     error: action.payload,
                 };
+
+        case actionTypes.SIGN_OUT_USER:
+            return initialState
+
+        case actionTypes.FETCH_USER_HOBBIES_SUCCESS:
+            return {
+                ...state,
+                user: {
+                ...state.user,
+                hobbies: action.payload,
+                },
+            };
+        
+        case actionTypes.FETCH_USER_HOBBIES_FAILURE:
+
+        case actionTypes.ADD_HOBBY_FAILURE:
+            return {
+                ...state,
+                error: action.payload,
+            };
+    
+        case actionTypes.ADD_HOBBY_SUCCESS:
+            return {
+                ...state,
+                user: {
+                ...state.user,
+                hobbies: [...state.user.hobbies, action.payload],
+                },
+            };
 
         default:
             return state;
