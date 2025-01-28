@@ -6,6 +6,7 @@ const userRoutes = require("./Routes/userRoute");
 const studentRoutes = require("./Routes/studentRoute");
 const productRoutes = require("./Routes/productRoute");
 const cartRoutes = require("./Routes/cartRoute");
+const recentOrderRoutes = require("./Routes/recentOrderRoute");
 
 const app = express();
 const PORT = 9000;
@@ -20,6 +21,7 @@ app.use("/user", userRoutes); // User-related routes
 app.use("/student", studentRoutes); // Student-related routes
 app.use("/product", productRoutes); // Product-related routes
 app.use("/cart", cartRoutes); // Cart-related routes
+app.use("/recent-orders", recentOrderRoutes); // Recent order-related routes
 app.use("/", defaultRoutes); // Default routes
 
 // Handle 404 for undefined routes

@@ -84,4 +84,34 @@ userRouter.post("/getUser", (req, res) => {
         });
 });
 
+userRouter.get("/hobbies", async (req, res) => {
+    const userName = req.query.userName; 
+
+    try {
+        const user = await userDataModel.findOne({ userName }); 
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json(user.hobbies);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching hobbies", error });
+    }
+});
+
+userRouter.post("/addHobby", async (req, res) => {
+    const { hobby, userName } = req.body; 
+
+    try {
+        const user = await userDataModel.findOne({ userName });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        user.hobbies.push(hobby);
+        await user.save();
+        res.status(200).json(hobby);
+    } catch (error) {
+        res.status(500).json({ message: "Error saving hobby", error });
+    }
+});
+
 module.exports = userRouter;

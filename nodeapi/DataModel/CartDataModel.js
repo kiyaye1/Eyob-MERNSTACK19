@@ -1,19 +1,13 @@
-// Import the mongoose library for interacting with MongoDB
-let mongooseObj = require("mongoose");
+let mongooseObj = require("mongoose"); // Import the mongoose library for interacting with MongoDB
 
-// Get the Schema object from mongoose for defining schemas
-let schemaObj = mongooseObj.Schema;
+let schemaObj = mongooseObj.Schema; // Get the Schema object from mongoose for defining schemas
 
-// Connect to the MongoDB database using the provided URL
-mongooseObj.connect("mongodb://127.0.0.1/mernstack19");
+mongooseObj.connect("mongodb://127.0.0.1/mernstack19"); // Connect to the MongoDB database using the provided URL
 
-// Define the schema for the Cart collection
-let CartSchema = new schemaObj(
+let CartSchema = new schemaObj( // Define the schema for the Cart collection
   {
     userid: { type: String, required: true },
-    
-    // An array of cart items --- any type (Mixed)
-    cart: [
+    cart: [ // An array of cart items --- any type (Mixed)
       {
         type: schemaObj.Types.Mixed,
       },
@@ -24,8 +18,6 @@ let CartSchema = new schemaObj(
   }
 );
 
-// Create a model named "cart" based on the defined schema
-let CartModel = mongooseObj.model("cart", CartSchema);
+let CartModel = mongooseObj.model("cart", CartSchema); // Create a model named "cart" based on the defined schema
 
-// Export the CartModel so it can be used in other files
-module.exports = CartModel;
+module.exports = CartModel; // Export the CartModel so it can be used in other files

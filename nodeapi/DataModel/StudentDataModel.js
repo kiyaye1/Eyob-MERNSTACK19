@@ -1,4 +1,5 @@
 let mongooseObj = require("mongoose");
+
 schemaObj = mongooseObj.Schema;
 
 mongooseObj.connect("mongodb://127.0.0.1/mernstack19");
