@@ -16,12 +16,13 @@ const ATMDispenser = () => {
         const result = {};
         let totalNotes = 0;
 
-        currencyNotes.forEach((note) => {
+        for (let i = currencyNotes.length - 1; i >= 0; i--) {
+            const note = currencyNotes[i];
             const count = Math.floor(remainingAmount / note);
             remainingAmount %= note;
             result[note] = count;
             totalNotes += count;
-        });
+        }
 
         result.totalNotes = totalNotes;
         setDenominations(result);
