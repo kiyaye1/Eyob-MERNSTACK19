@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { updateCheckoutStatus } from "../../State/Cart/CartActions";
-import { saveOrder } from "../../State/RecentOrder/recentOrdersActions";
 import CouponComponent from "./CouponComponent";
 import axiosInstance from "../../axiosConfig";
 
@@ -53,40 +52,36 @@ const CheckoutComponent = React.memo(() => {
         total: totalAmount,
         discount,
       };
-
-      const responseData = await dispatch(saveOrder(orderData));
-
+  
+      // Make sure API URL is correct
+      console.log("Sending orderData:", orderData);
+  
+      const response = await axiosInstance.post("/recent-orders", orderData);
+  
+      if (!response || response.status !== 201) {
+        throw new Error(`API Error: ${response?.statusText}`);
+      }
+  
+      console.log("Order response:", response.data);
+  
       await dispatch(updateCheckoutStatus(email, selectedItems));
-
-      if (responseData.downloadLink) {
-        setDownloadLink(responseData.downloadLink);
+  
+      if (response.data.downloadLink) {
+        setDownloadLink(response.data.downloadLink);
       }
       setIsPaymentDone(true);
     } catch (error) {
-      console.error("Error processing payment:", error.message);
-      alert("Failed to process payment. Please try again.");
+      console.error("Error processing payment:", error.response?.data || error.message);
+      alert(`Failed to process payment: ${error.response?.data?.error || error.message}`);
     }
   }, [email, selectedItems, totalAmount, discount, dispatch]);
+  
 
   const handleDownload = async () => {
-    try {
-      const response = await axiosInstance.get(downloadLink, {
-        responseType: "blob", // Ensures the response is treated as a file
-      });
-  
-      // Create a downloadable URL from the blob
-      const fileURL = window.URL.createObjectURL(new Blob([response.data]));
-  
-      // Create a temporary link and trigger download
-      const link = document.createElement("a");
-      link.href = fileURL;
-      link.setAttribute("download", "Order_Receipt.pdf"); // Set the filename
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error("Error downloading file:", error);
-      alert("Failed to download file. Please try again.");
+    if (downloadLink) {
+      window.open(downloadLink, "_blank"); // Opens the PDF from S3
+    } else {
+      alert("Download link not available.");
     }
   };
 

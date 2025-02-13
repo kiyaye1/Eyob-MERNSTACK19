@@ -158,7 +158,7 @@ const CartComponent = React.memo(() => {
                     <td>{item.name}</td>
                     <td>${parseFloat(item.price || 0).toFixed(2)}</td>
                     <td>{item.description}</td>
-                    <td>{item.rating}</td>
+                    <td>{item.rating.toFixed(2)}</td>
                     <td>
                       <input
                         type="number"

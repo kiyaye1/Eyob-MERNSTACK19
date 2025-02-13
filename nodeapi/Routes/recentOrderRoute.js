@@ -5,9 +5,19 @@ const RecentOrderModel = require("../DataModel/RecentOrderDataModel");
 const CartDataModel = require("../DataModel/CartDataModel");
 const UserDataModel = require("../DataModel/UserDataModel");
 
+const AWS = require("aws-sdk");
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const path = require("path");
+
+// Configure AWS S3
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: "us-east-2",
+});
+
+const s3 = new AWS.S3();
 
 const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
@@ -43,14 +53,45 @@ recentOrderRouter.post("/", async (req, res) => {
 
     const pdfFileName = `order_${savedOrder._id}.pdf`;
     
-    const pdfPath = path.join("D:", "SynergisticIT", pdfFileName);
-
+    // Generate PDF in memory
     const doc = new PDFDocument();
-    doc.pipe(fs.createWriteStream(pdfPath));
+    const buffers = [];
+    doc.on("data", buffers.push.bind(buffers));
+    doc.on("end", async () => {
+      const pdfBuffer = Buffer.concat(buffers);
 
+      // Upload PDF to S3
+      const params = {
+        Bucket: "syn-cart-order-pdfs", 
+        Key: pdfFileName,
+        Body: pdfBuffer,
+        ContentType: "application/pdf",
+      };
+
+      const s3Upload = await s3.upload(params).promise();
+      console.log("Uploaded to S3:", s3Upload.Location);
+
+      // Send email with S3 link
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: userDoc.email,
+        subject: "Order Confirmation",
+        text: `Your order (ID: ${savedOrder._id}) has been placed successfully! Download PDF: ${s3Upload.Location}`,
+      };
+
+      await transporter.sendMail(mailOptions);
+
+      res.status(201).json({
+        success: true,
+        message: "Order created, PDF uploaded to S3, and email sent successfully.",
+        order: savedOrder,
+        downloadLink: s3Upload.Location,
+      });
+    });
+
+    // Generate PDF content
     doc.fontSize(20).text("Order Confirmation", { underline: true });
     doc.moveDown();
-
     doc.fontSize(14).text(`Order ID: ${savedOrder._id}`);
     doc.text(`User ID: ${savedOrder.userId}`);
     doc.text(`Status: ${savedOrder.status || "Pending"}`);
@@ -58,41 +99,15 @@ recentOrderRouter.post("/", async (req, res) => {
     doc.text(`Discount: $${savedOrder.discount.toFixed(2)}`);
     doc.text(`Payable Amount: $${(savedOrder.total - savedOrder.discount).toFixed(2)}`);
     doc.moveDown();
-
     doc.text("Items:", { underline: true });
     savedOrder.order.forEach((item, index) => {
-      doc.text(
-        `${index + 1}. ${item.name} | Qty: ${item.quantity} | Unit Price: $${item.price}`
-      );
+      doc.text(`${index + 1}. ${item.name} | Qty: ${item.quantity} | Unit Price: $${item.price}`);
     });
 
     doc.end();
-
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: userDoc.email,
-      subject: "Order Confirmation",
-      text: `Your order (ID: ${savedOrder._id}) has been placed successfully!`,
-      
-      attachments: [
-          {
-            filename: pdfFileName,
-            path: pdfPath,
-          },
-      ],
-    };
-
-    await transporter.sendMail(mailOptions);
-
-    res.status(201).json({
-      success: true,
-      message: "Order created, PDF generated, and email sent successfully.",
-      order: savedOrder,
-      downloadLink: `/recent-orders/download/${savedOrder._id}`,
-    });
   } catch (err) {
-    console.error("Error creating order or sending email:", err);
-    res.status(500).json({ error: "Failed to save the order or send email." });
+    console.error("Error creating order or uploading PDF:", err);
+    res.status(500).json({ error: "Failed to save the order or upload PDF." });
   }
 });
 
@@ -227,31 +242,6 @@ recentOrderRouter.put("/:id/deliver", async (req, res) => {
     res.status(200).json({ message: "Order delivered successfully", order });
   } catch (err) {
     res.status(500).json({ error: "Failed to deliver order" });
-  }
-});
-
-recentOrderRouter.get("/download/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const pdfFileName = `order_${id}.pdf`;
-    const pdfPath = path.join("D:", "SynergisticIT", pdfFileName); 
-
-    // Check if file exists
-    if (!fs.existsSync(pdfPath)) {
-      return res.status(404).json({ error: "PDF not found" });
-    }
-
-    res.setHeader("Content-Disposition", `attachment; filename=${pdfFileName}`);
-    res.setHeader("Content-Type", "application/pdf");
-    res.download(pdfPath, pdfFileName, (err) => {
-      if (err) {
-        console.error("Error downloading PDF:", err);
-        res.status(500).json({ error: "Error downloading PDF" });
-      }
-    });
-  } catch (err) {
-    console.error("Error in PDF download route:", err);
-    res.status(500).json({ error: "Internal server error" });
   }
 });
 
